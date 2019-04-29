@@ -47,7 +47,7 @@ app.post('/search', function (req, res) {
         let list = [];
         $ = cheerio.load(body);
 
-        let result = $(".music_type .type01 > li dt > a:first-child");
+        let result = $(".music_type .type01 > li dl ");
 
         for (let i = 0; i < result.length; i++) {
             let msg = $(result[i]).text();
