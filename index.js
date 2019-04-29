@@ -4,6 +4,7 @@ const path = require('path');
 const request = require('request');
 const cheerio = require('cheerio');
 const bodyparser = require('body-parser');
+const qs = require('querystring');
 
 let app = express();
 
@@ -25,9 +26,9 @@ app.get('/poplist', function (req, res) {
         let list = [];
         $ = cheerio.load(body);
 
-        let poplist = $(".data1 > td > a > .ellipsis");
+        let poplist = $("._tracklist_move > .name");
 
-        for (let i = 0; i < poplist.length; i++) {
+        for (let i = 1; i < poplist.length; i++) {
             let msg = $(poplist[i]).text();
             list.push(msg);
         }
@@ -42,11 +43,18 @@ app.get('/indielist', function (req, res) {
         let list = [];
         $ = cheerio.load(body);
 
-        let indielist = $(".lst50 > td > .wrap > .wrap_song_info > .rank01");
+        let indielist = $("#frm table > tbody > tr");
 
         for (let i = 0; i < indielist.length; i++) {
-            let msg = $(indielist[i]).text();
-            list.push(msg);
+            let data = {};
+            data.rank = $(indielist[i]).find("td:nth-child(2) .rank").text();
+            data.src = $(indielist[i]).find("td:nth-child(4) img").attr("src");
+            data.title = $(indielist[i]).find("td:nth-child(6) .rank01").text();
+            data.artist = $(indielist[i]).find("td:nth-child(6) .rank02").text();
+            data.album = $(indielist[i]).find("td:nth-child(7) .rank03 a").text();
+            
+            list.push(data);
+            
         }
 
         res.render('indielist', { msg: '국내 인디 TOP 100', list: list });
@@ -59,7 +67,9 @@ app.get('/search', function (req, res) {
 
 app.post('/search', function (req, res) {
     let word = req.body.word;
+    word = qs.escape(word);
     let url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + word;
+    
     request(url, function (err, response, body) {
         let list = [];
         $ = cheerio.load(body);

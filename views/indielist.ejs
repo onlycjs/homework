@@ -8,11 +8,21 @@
         <div class="row mt-4">
             <div class="col-10 offset-1">
                 <h1><%= msg %></h1>
-                <ul class="list-group">
-                    <% for(let i = 0; i < list.length; i++) { %>
-                    <li class="list-group-item"><%= list[i] %></li>
-                    <% } %>
-                </ul>
+
+                <% for(let i = 0; i < list.length; i++) { %>
+                    <div class="media mt-1" style="border:solid #7290a1;">
+                        <img src="<%= list[i].src %>" class="mr-3" alt="...">
+                        <div class="media-body">
+                            <h5 class="mt-0"><%= list[i].title %></h5>
+                            <p>
+                                순위 : <%= list[i].rank %> <br>
+                                가수 : <%= list[i].artist %> <br>
+                                앨범 : <%= list[i].album %> <br>
+                            </p>
+                        </div>
+                    </div>
+                <% } %>
+
             </div>
         </div>
     </div>
