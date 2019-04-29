@@ -25,14 +25,31 @@ app.get('/poplist', function (req, res) {
         let list = [];
         $ = cheerio.load(body);
 
-        let poplist = $("._tracklist_move  .name .ellipsis");
+        let poplist = $(".data1 > td > a > .ellipsis");
 
         for (let i = 0; i < poplist.length; i++) {
             let msg = $(poplist[i]).text();
             list.push(msg);
         }
 
-        res.render('poplist', { msg: '해외 TOP 100', list: list });
+        res.render('poplist', { msg: '국내 팝송 TOP 100', list: list });
+    });
+});
+
+app.get('/indielist', function (req, res) {
+
+    request("https://www.melon.com/chart/style/index.htm?styleCd=GN0502#params%5Bidx%5D=1&params%5BstartDay%5D=20190422&params%5BendDay%5D=20190428&params%5BisFirstDate%5D=false&params%5BisLastDate%5D=true", function (err, response, body) {
+        let list = [];
+        $ = cheerio.load(body);
+
+        let indielist = $(".lst50 > td > .wrap > .wrap_song_info > .rank01");
+
+        for (let i = 0; i < indielist.length; i++) {
+            let msg = $(indielist[i]).text();
+            list.push(msg);
+        }
+
+        res.render('indielist', { msg: '국내 인디 TOP 100', list: list });
     });
 });
 
@@ -47,14 +64,14 @@ app.post('/search', function (req, res) {
         let list = [];
         $ = cheerio.load(body);
 
-        let result = $(".music_type .type01 > li dl ");
+        let result = $(".music_type .type01 > li  .music_lst");
 
         for (let i = 0; i < result.length; i++) {
             let msg = $(result[i]).text();
             list.push(msg);
         }
 
-        res.render('search', { msg: '팝송 검색 결과', list: list });
+        res.render('search', { msg: '음악 검색 결과', list: list });
     });
 });
 
