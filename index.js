@@ -147,7 +147,7 @@ app.get('/dancelist', function (req, res) {
 
         }
 
-        res.render('indielist', { msg: '국내 발라드 TOP 100', list: list });
+        res.render('indielist', { msg: '국내 댄스 TOP 100', list: list });
     });
 });
 
@@ -175,37 +175,57 @@ app.post('/search', function (req, res) {
     });
 });
 
-app.get('/searching', function (req, res) {
-    res.render('searching', {});
-});
+app.get('/melonlist', function (req, res) {
 
-app.post('/searching', function (req, res) {
-    let word = req.body.word;
-    word = qs.escape(word);
-
-    console.log(word);
-    let url =  "https://kin.naver.com/search/list.nhn?query=" + word;
-
+    let url = "https://www.melon.com/chart/";
 
     request(url, function (err, response, body) {
+
+        let sql = "INSERT INTO melonlist (rank, image, mTitle, sName) VALUE(?, ?, ?, ?)";
+
+        let list2 = [];
         $ = cheerio.load(body);
 
-        let searching = $(".section .number em");
-        // let result = $(searching) + (searching.text().split("/")[1].split(",").join(""));
-        let txt = req.body.word;
-        let list = [txt ,searching];
-        let sql = "INSERT INTO searching (word, reuslt) VALUES ?";
-        conn.query(sql, [list], function (err, result, fields) {
-        });
-        let sql2 = "SELECT * FROM searching WHERE word LIKE ?";
-        txt = "%" + req.body.key + "%";
+        for (let i = 1; i <= 100; i++) {
+            let rank = $(".service_list_song > table > tbody tr:nth-child(" + i + ") .t_center .rank").text();
+            let title = $(".service_list_song > table > tbody tr:nth-child(" + i + ") td:nth-child(6) .wrap .wrap_song_info .rank01 a").text();
+            let singer = $(".service_list_song > table > tbody tr:nth-child(" + i + ") td:nth-child(6) .wrap .wrap_song_info .rank02 > a").text();
 
-        conn.query(sql2, [txt], function (err, result) {
-            res.render('searching', { msg: '검색결과', list: result });
-        });
+            let list = [rank, title, singer];
+
+            conn.query(sql, list, function (err, result) { });
+
+            list2[i - 1] = list;
+
+        }
+
+        console.log(list2.length);
+
+        res.render('melonlist', { res: list2, msg: "멜론 실시간 top100" });
+
     });
 });
-    let server = http.createServer(app);
-    server.listen(app.get('port'), function () {
-        console.log(`Express 엔진이 ${app.get('port')}에서 실행중`);
+
+app.get('/timegraph', function (req, res) {
+    res.render('timegraph', {});
+});
+
+app.post('/timegraph', function (req, res) {
+
+    let key = req.body.word + "%";
+    console.log(key);
+
+    let sql = "SELECT * FROM melonlist WHERE mTitle LIKE ? ORDER BY Date";
+
+    conn.query(sql, [key], function (err, result) {
+
+        res.render('timegraph', { list: result, msg: "실시간 차트 그래프" });
+
     });
+
+});
+
+let server = http.createServer(app);
+server.listen(app.get('port'), function () {
+    console.log(`Express 엔진이 ${app.get('port')}에서 실행중`);
+});

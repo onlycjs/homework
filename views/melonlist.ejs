@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<% include layout/head %>
+
+<body>
+    <% include layout/nav %>
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col-10 offset-1">
+                <h1><%= msg %></h1>
+                <table class="table striped" style="border:solid #7290a1;">
+                    <tr>
+                        <th>순위</th>
+                        <th width="60%">제목</th>
+                        <th>가수</th>
+                    </tr>
+                    <% for(let i = 0; i < res.length; i++) { %>
+                        <tr>
+                            
+                            <% for(let j = 0; j < 1; j++) { %>
+                            
+                                <th><%= res[i][0] %></th>
+                                <th><%= res[i][1] %></th>
+                                <th><%= res[i][2] %></th>
+                            <% } %>
+                        </tr>
+                    <% } %>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
