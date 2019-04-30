@@ -46,9 +46,9 @@ app.get('/poplist', function (req, res) {
             data.title = $(poplist[i]).find("td:nth-child(6) .rank01").text();
             data.artist = $(poplist[i]).find("td:nth-child(6) .rank02").text();
             data.album = $(poplist[i]).find("td:nth-child(7) .rank03 a").text();
-            
+
             list.push(data);
-            
+
         }
 
         res.render('poplist', { msg: '국내 팝송 TOP 100', list: list });
@@ -70,9 +70,9 @@ app.get('/indielist', function (req, res) {
             data.title = $(indielist[i]).find("td:nth-child(6) .rank01").text();
             data.artist = $(indielist[i]).find("td:nth-child(6) .rank02").text();
             data.album = $(indielist[i]).find("td:nth-child(7) .rank03 a").text();
-            
+
             list.push(data);
-            
+
         }
 
         res.render('indielist', { msg: '국내 인디 TOP 100', list: list });
@@ -94,9 +94,9 @@ app.get('/hiplist', function (req, res) {
             data.title = $(hiplist[i]).find("td:nth-child(6) .rank01").text();
             data.artist = $(hiplist[i]).find("td:nth-child(6) .rank02").text();
             data.album = $(hiplist[i]).find("td:nth-child(7) .rank03 a").text();
-            
+
             list.push(data);
-            
+
         }
 
         res.render('indielist', { msg: '국내 힙합 TOP 100', list: list });
@@ -118,9 +118,9 @@ app.get('/balladlist', function (req, res) {
             data.title = $(balladlist[i]).find("td:nth-child(6) .rank01").text();
             data.artist = $(balladlist[i]).find("td:nth-child(6) .rank02").text();
             data.album = $(balladlist[i]).find("td:nth-child(7) .rank03 a").text();
-            
+
             list.push(data);
-            
+
         }
 
         res.render('indielist', { msg: '국내 발라드 TOP 100', list: list });
@@ -142,9 +142,9 @@ app.get('/dancelist', function (req, res) {
             data.title = $(dancelist[i]).find("td:nth-child(6) .rank01").text();
             data.artist = $(dancelist[i]).find("td:nth-child(6) .rank02").text();
             data.album = $(dancelist[i]).find("td:nth-child(7) .rank03 a").text();
-            
+
             list.push(data);
-            
+
         }
 
         res.render('indielist', { msg: '국내 발라드 TOP 100', list: list });
@@ -159,7 +159,7 @@ app.post('/search', function (req, res) {
     let word = req.body.word;
     word = qs.escape(word);
     let url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + word;
-    
+
     request(url, function (err, response, body) {
         let list = [];
         $ = cheerio.load(body);
@@ -175,23 +175,37 @@ app.post('/search', function (req, res) {
     });
 });
 
-app.get('/ranking', function (req, res) {
-    let sql = "SELECT * FROM ranking";
-    
-    let keyword = "%%";
-    console.log(req.query.key);
-    if(req.query.key != undefined){
-        keyword = "%" + req.query.key + "%";
-    }
-    console.log(keyword);
-    conn.query(sql, [keyword], function (err, result) {
-        console.log(result);
+app.get('/searching', function (req, res) {
+    res.render('searching', {});
+});
 
-        res.render('ranking', {list:result});
+app.post('/searching', function (req, res) {
+    let word = req.body.word;
+    word = qs.escape(word);
+
+    console.log(word);
+    let url =  "https://kin.naver.com/search/list.nhn?query=" + word;
+
+
+    request(url, function (err, response, body) {
+        $ = cheerio.load(body);
+
+        let searching = $(".section .number em");
+        // let result = $(searching) + (searching.text().split("/")[1].split(",").join(""));
+        let txt = req.body.word;
+        let list = [txt ,searching];
+        let sql = "INSERT INTO searching (word, reuslt) VALUES ?";
+        conn.query(sql, [list], function (err, result, fields) {
+        });
+        let sql2 = "SELECT * FROM searching WHERE word LIKE ?";
+        txt = "%" + req.body.key + "%";
+
+        conn.query(sql2, [txt], function (err, result) {
+            res.render('searching', { msg: '검색결과', list: result });
+        });
     });
 });
-
-let server = http.createServer(app);
-server.listen(app.get('port'), function () {
-    console.log(`Express 엔진이 ${app.get('port')}에서 실행중`);
-});
+    let server = http.createServer(app);
+    server.listen(app.get('port'), function () {
+        console.log(`Express 엔진이 ${app.get('port')}에서 실행중`);
+    });
