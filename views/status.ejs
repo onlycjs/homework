@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<% include layout/head %>
+
+<body>
+    <% include layout/nav %>
+    <div class="container">
+        <div class="row mt-4">
+            <div class="col-10 offset-1">
+                <form class="form-inline" method="post">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="word" class="sr-only">실시간 음악 순위</label>
+                        <input type="text" name="word" class="form-control" id="word" placeholder="노래 제목 입력">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">검색하기</button>
+                </form>
+            </div>
+            <div class="col-10 offset-1">
+                <table class="table striped" style="border:solid #7290a1;">
+                    <tr>
+                        <th>순위</th> 
+                        <th>엘범이미지</th>                  
+                        <th>노래제목</th>
+                        <th>가수</th>
+                        <th>기록된 날짜</th>
+                        <th>기록된 시간</th>
+                    </tr>
+                    <% if(typeof list != 'undefined') { %>
+                        <% for(let i = 0; i < list.length; i++) { %>
+                            <tr>
+                                <th><%= list[i].rank %></th>
+                                <th><img src='<%= list[i].image %>' alt="albumcover"></th>                            
+                                <th><%= list[i].mTitle %></th>
+                                <th><%= list[i].sName %></th>                            
+                                <th><%= list[i].Date %></th>
+                                <th><%= list[i].Time %></th>
+                            </tr>
+                        <% } %>    
+                    <% } %>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

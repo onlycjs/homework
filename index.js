@@ -181,45 +181,58 @@ app.get('/melonlist', function (req, res) {
 
     request(url, function (err, response, body) {
 
-        let sql = "INSERT INTO melonlist (rank, image, mTitle, sName) VALUE(?, ?, ?, ?)";
+        let sql = "INSERT INTO melonlist (rank, image, mTitle, sName, Date, Time) VALUE(?, ?, ?, ?, curdate(), curtime())";
 
-        let list2 = [];
+        let listC = [];
         $ = cheerio.load(body);
 
         for (let i = 1; i <= 100; i++) {
             let rank = $(".service_list_song > table > tbody tr:nth-child(" + i + ") .t_center .rank").text();
+            let image = $(".service_list_song > table > tbody tr:nth-child(" + i + ") td:nth-child(4) a img").attr("src");
             let title = $(".service_list_song > table > tbody tr:nth-child(" + i + ") td:nth-child(6) .wrap .wrap_song_info .rank01 a").text();
             let singer = $(".service_list_song > table > tbody tr:nth-child(" + i + ") td:nth-child(6) .wrap .wrap_song_info .rank02 > a").text();
 
-            let list = [rank, title, singer];
+            let listA = [rank, image, title, singer];
 
-            conn.query(sql, list, function (err, result) { });
+            conn.query(sql, listA, function (err, result) { });
 
-            list2[i - 1] = list;
+            let listB = [rank, title, singer];
+
+            listC[i - 1] = listB;
 
         }
 
-        console.log(list2.length);
-
-        res.render('melonlist', { res: list2, msg: "멜론 실시간 top100" });
+        res.render('melonlist', { res: listC, msg: "멜론 실시간 top100" });
 
     });
 });
 
-app.get('/timegraph', function (req, res) {
-    res.render('timegraph', {});
+app.get('/status', function(req, res){
+    res.render('status', {});
 });
 
-app.post('/timegraph', function (req, res) {
+app.post('/status', function(req, res){
 
     let key = req.body.word + "%";
     console.log(key);
 
-    let sql = "SELECT * FROM melonlist WHERE mTitle LIKE ? ORDER BY Date";
+    let selectData = "SELECT * FROM melonlist WHERE mTitle LIKE ? ORDER BY rank, sName, Date, Time";
 
-    conn.query(sql, [key], function (err, result) {
+    let updateData = "UPDATE melonlist SET rank=rank,Date=curdate(),Time=curtime()";
+    
+    let deleteData = "DELETE FROM melonlist WHERE melonlist.id > 100";
 
-        res.render('timegraph', { list: result, msg: "실시간 차트 그래프" });
+    conn.query(deleteData, [key], function(err, result){
+        
+    });
+
+    conn.query(updateData, [key], function(err, result){
+
+    });
+
+    conn.query(selectData, [key], function (err, result){
+
+        res.render('status', {list : result, msg:"실시간 음악 순위"});
 
     });
 

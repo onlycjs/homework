@@ -17,11 +17,9 @@
                     <% for(let i = 0; i < res.length; i++) { %>
                         <tr>
                             
-                            <% for(let j = 0; j < 1; j++) { %>
+                            <% for(let j = 0; j < res[i].length; j++) { %>
                             
-                                <th><%= res[i][0] %></th>
-                                <th><%= res[i][1] %></th>
-                                <th><%= res[i][2] %></th>
+                                <th><%= res[i][j] %></th>
                             <% } %>
                         </tr>
                     <% } %>
