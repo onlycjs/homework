@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<% include layout/head %>
+
+<body>
+    <% include layout/nav %>
+    <div class="container">
+
+        <div class="row mt-4">
+
+            <h1>데이터 차트</h1>
+            <div class="col-10 offset-1">
+                <form class="form-inline" method="post">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="word" class="sr-only">검색어</label>
+                        <input type="text" name="league" class="form-control" id="mTitle" placeholder="노래 입력">
+                        <input type="text" name="rank" class="form-control" id="sName" placeholder="가수 입력">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">검색하기</button>
+                </form>
+
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    new Chart(document.getElementById("myChart"), {
+        "type": "bar",
+        "data": {
+            "labels": [
+                <% if(typeof list != 'undefined') {  %>
+                "순위", "노래", "시간",
+               <% } %> 
+            ],
+        "datasets": [{
+                <% if (typeof list != 'undefined') {
+            for (let i = 0; i < list.length; i++) { %>
+               
+                "label": "<%= list[i].mTitle %>",
+                "fill": false,
+                    "borderWidth": 1,
+                    "data": [
+                <%= list[i].rank %>,
+                <%= list[i].mTitle %>,
+                <%= list[i].sName %>,
+                <%= list[i].Time %>,
+                ]
+               <% if(i+1 != list.length){ %>
+                 }, {
+            <% } else{ 
+                 break; } %>
+         
+                <% }
+        } %>
+        
+        }]         
+            }, "options": {
+        "scales": {
+            "yAxes": [{
+                "ticks": {
+                    "beginAtZero": true
+                }
+            }]
+        }
+    }
+        });
+</script>
+
+</html>

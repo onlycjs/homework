@@ -238,6 +238,29 @@ app.post('/status', function(req, res){
 
 });
 
+app.get('/graph', function(req, res){
+    res.render('graph', {});
+});
+
+app.post('/graph', function (req, res) {
+
+    let key = req.body.word;
+    console.log(key);
+
+    let sql = "SELECT * FROM melonlist WHERE mtitle LIKE ? ORDER BY Time";
+
+    let mTitle = req.body.mTitle;
+    mTitle = qs.escape(mTitle);
+    mTitle = "%" + req.body.mTitle + "%";
+    let sName = req.body.sName;
+    sName = qs.escape(sName);
+    conn.query(sql, [mTitle,sName], function(err, result){
+        res.render('graph', { msg: '검색 결과',list:result});
+    });
+});
+
+
+
 let server = http.createServer(app);
 server.listen(app.get('port'), function () {
     console.log(`Express 엔진이 ${app.get('port')}에서 실행중`);
